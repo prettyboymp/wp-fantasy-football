@@ -1,0 +1,45 @@
+/*
+Theme Name: Fantasy Football
+Theme URI: http://wordpress.org/
+Description: Fantasy Football Theme
+Author: Michael Pretty
+Version: 1.0
+Tags: Fantasy Football
+*/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {margin: 0; padding: 0; border: 0; vertical-align: baseline; background: transparent;}
+body {line-height: 1;}
+h1, h2, h3, h4, h5, h6 {font-weight: normal; clear: both;}
+blockquote {quotes: none;}
+blockquote:before, blockquote:after {content: ''; content: none;}
+del {text-decoration: line-through;}
+table {border-collapse: collapse; border-spacing: 0;}
+a img { border: none; }
+
+body{background-color: #ccc;}
+#header{width: 100%; height: 20px; border-bottom: 1px #000; position: fixed; background-color: #ccc; z-index: 999;}
+#ranking{float: left; height: 100%; width: 600px; background-color: #fff; margin-top: 20px;}
+
+#players {margin: 0; padding: 0; width: auto; list-style: decimal inside none; color: #333; z-index: 99;}
+#players li { margin: 3px; padding: 2px; font-size: 10px; height: 30px; border: 1px solid #000; background-color: #EEE;}
+#players li.drafted{opacity: .3;}
+#players li div { position: absolute; margin: -12px 0 0 24px;  float: left; width: 160px; height: 28px; font-size: 14px; line-height: 16px;}
+#players li div span{font-weight: bold;}
+#players li textarea{background-color: rgb(255, 255, 204); color: black; height: 28px; border: 1px solid #fff; float: right; width: 400px;}
+#players.hide-drafted li.drafted{display: none;}
+
+
+#players li.QB{background-color: #D2EBD2;}
+#players li.RB{background-color: #D2D4EB;}
+#players li.WR{background-color: #EBD2D6;}
+#players li.TE{background-color: #EBEAD2;}
+#players li.K{background-color: #EEE;}
+#players li.FA{background-color: #EEE;}
+
+
+#teams{right: 0px; top: 22px; width: 1095px; position: fixed;}
+#teams ul {font-size: 12px; list-style-type: none;}
+#teams ul li {float: left; width: 250px; height: 210px; background-color: #fff; border: 1px solid #000; margin: 1px; text-indent: 5px; overflow: hidden;}
+#teams ul li li {font-size: 10px; float: none; height: auto; border: none; text-indent: 5px; margin: 2px 0 0 0;}
+#teams li em{width: 38px; float: left; background-color: #eee; padding-rigth: 2px;}
+.team_name{font-weight: bold; text-transform: uppercase; line-height: 14px;}
