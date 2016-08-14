@@ -1,0 +1,9 @@
+.DS_Store
+/nbproject
+/node_modules
+.sass-cache/
+
+#build files
+js/main.min.js
+js/libs/bootstrap.min.js
+style.css

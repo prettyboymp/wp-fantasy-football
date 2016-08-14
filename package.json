@@ -1,0 +1,24 @@
+{
+	"name": "wp-fantasy-football",
+	"description": "Fantasy Football",
+	"version": "0.1.0",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:prettyboymp/wp-fantasy-football.git"
+	},
+	"bugs": {
+		"url": "https://github.com/prettyboymp/wp-fantasy-football/issues"
+	},
+	"devDependencies": {
+		"grunt": "~0.4.5",
+		"grunt-contrib-jshint": "~1.0",
+		"grunt-contrib-uglify": "~2.0",
+		"grunt-react": "^0.12.3",
+		"grunt-contrib-concat": "~1.0",
+		"grunt-contrib-imagemin": "~1.0",
+		"grunt-contrib-compass": "~1.0",
+		"grunt-autoprefixer": "~3.0.4",
+		"grunt-contrib-watch": "~1.0",
+		"grunt-peon-build": "~0.1"
+	}
+}
