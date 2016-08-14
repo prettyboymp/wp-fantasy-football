@@ -1,0 +1,211 @@
+table {
+	@extend .table;
+}
+code {
+	white-space: normal;
+}
+ul {
+	padding: 0;
+}
+
+.post-entry {
+	position: relative;
+}
+
+.attachment-container {
+	text-align: center;
+	margin-bottom: 20px;
+	img {
+		margin: 0 auto;
+	}
+}
+.thumbnail {
+	margin-bottom: 20px;
+}
+.category-buttons {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	li {
+		float: left;
+		display: inline;
+		list-style: none;
+		margin: 0 10px 10px 0;
+	}
+	a {
+		@extend .btn;
+		@extend .btn-info;
+		border-radius: none;
+	}
+}
+.entry-header {
+	.entry-meta {
+		border-bottom: 1px solid #777;
+	}
+}
+footer.entry-meta {
+	padding-bottom: 10px;
+	p {
+		margin: 0;
+		padding: 5px 0 0 0;
+	}
+}
+
+span.value {
+	display: block;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+#rank-page {
+	padding-left: 0;
+	padding-right: 0;
+	.col-xs-6 {
+		padding-left: 0;
+		padding-right: 0;
+	}
+	
+	li {
+		border: 1px solid #444;
+  	color: #FFF;
+		padding: 5px;
+		margin-top: 4px;
+		font-size: 16px;
+		
+		&.highlighted {
+			border-color: red !important;
+			border-width: 3px;
+			padding: 3px;
+		}
+		
+		span.val {
+			display: inline-block;
+			width: 50px;
+			margin-left: 5px;
+			font-weight: bold;
+		}
+		
+		&.player-RB {
+			background-color: #337ab7;
+			border-color: #2e6da4;
+		}
+		
+		&.player-QB {
+			background-color: #5bc0de;
+			border-color: #46b8da;
+		}
+		
+		&.player-WR {
+			background-color: #5cb85c;
+			border-color: #4cae4c;
+		}
+		
+		&.player-TE {
+			background-color: #f0ad4e;
+			border-color: #eea236;
+		}
+		
+		&.player-DST {
+			background-color: #d9534f;
+			border-color: #d43f3a;
+		}
+		
+		&.player-K {
+			color: #000;
+			background-color: #ffffff;
+			border-color: #46b8da;
+		}
+	}
+}
+
+#draft-board {
+	span.num {
+		display: inline-block;
+		width: 38px;
+		text-align: center;
+		background-color: #5cb85c;
+		color: #fff;
+		background-color: #5cb85c;
+		margin: 2px 8px 5px 5px;
+		height: 24px;
+		font-size: 20px;
+		font-weight: bold;
+		line-height: 24px;
+	}
+	
+	.upcoming-picks h4 {
+		font-size: 30px;
+	}
+	
+	span.upcoming-pick {
+		display: inline-block;
+		color: #fff;
+		background-color: #4C66A4;
+		width: 100%;
+		height: 36px;
+		margin: 10px 0 0 0;
+		font-size: 30px;
+		line-height: 36px;
+		
+		span.num {
+			vertical-align: text-bottom;
+		}
+	}
+	
+	span.current-pick {
+		background-color: #EE0000;
+		height: 50px;
+		margin-bottom: -7px;
+		font-size: 48px;
+		line-height: 43px;
+	}
+	
+	div.roster {
+		ul {
+			margin: 0;
+		}
+		padding: 0px;
+		margin: 10px 0 0 0;
+		border: 1px solid #3498DB;
+		
+		h4 {
+			background-color: #3498DB;
+			color: #fff;
+			font-weight: bold;
+			font-size: 35px;
+			margin: 0;
+			line-height: 40px;
+			padding-left: 15px;
+		}
+	}
+	
+	div.current{
+		border: 4px solid #EE0000;
+		margin: 10px -3px -3px -3px;
+		h4 {
+			background-color: #EE0000;
+		}
+	}
+	
+	
+	li.roster-position {
+		font-size: 22px;
+		background-color: #fff;
+		height: 28px;
+		font-weight: bold;
+		
+		img{
+			margin-top: -8px;
+			width: 45px;
+			height: 29px;
+				
+		}
+		
+		&:nth-child(odd) {
+			background-color: #eee;
+		}
+		
+		
+		
+	}
+}
