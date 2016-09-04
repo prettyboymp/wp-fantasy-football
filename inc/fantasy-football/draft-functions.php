@@ -4,6 +4,7 @@ add_action( 'init', array( 'DraftAPI', 'init' ), 5 );
 
 use Prettyboymp\FantasyFootball\Player;
 use Prettyboymp\FantasyFootball\Team;
+use Prettyboymp\FantasyFootball\ESPN_Team;
 use Prettyboymp\FantasyFootball\DVDB_Team;
 
 class DraftAPI {
@@ -35,13 +36,13 @@ class DraftAPI {
 
 		$current_db_version = get_option( 'ff_db_version', '0.0' );
 		if ( self::DB_VER > $current_db_version ) {
-			require_once(ABSPATH . '/wp-admin/includes/upgrade.php');
+			require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
 
 			$charset_collate = '';
 
-			if ( !empty( $wpdb->charset ) )
+			if ( ! empty( $wpdb->charset ) )
 				$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
-			if ( !empty( $wpdb->collate ) )
+			if ( ! empty( $wpdb->collate ) )
 				$charset_collate .= " COLLATE $wpdb->collate";
 
 			$queries = array();
@@ -116,11 +117,11 @@ class DraftAPI {
 	}
 
 	public static function get_draft_config() {
-		$config = include __DIR__ . '/draft-config.php';
+		$config = include __DIR__ . '/configs/' . date( 'Y' ) . '/draft.php';
 
 		//comment out to randomize draft order
-		if ( $config['shuffle'] ) {
-			$draft_order = &$config['draft_order'];
+		if ( $config[ 'shuffle' ] ) {
+			$draft_order = &$config[ 'draft_order' ];
 			shuffle( $draft_order );
 		}
 
@@ -130,7 +131,7 @@ class DraftAPI {
 
 	public static function get_positions() {
 		$config = self::get_draft_config();
-		return $config['positions'];
+		return $config[ 'positions' ];
 	}
 
 	public static function start_new_draft() {
@@ -144,8 +145,8 @@ class DraftAPI {
 		$draft_id = ( int ) $wpdb->insert_id;
 
 		$config = self::get_draft_config();
-		if ( isset( $config['draft_order'] ) ) {
-			$team_keys = $config['draft_order'];
+		if ( isset( $config[ 'draft_order' ] ) ) {
+			$team_keys = $config[ 'draft_order' ];
 		} else {
 			//set draft order
 			$team_keys = $wpdb->get_col( "SELECT team_key FROM " . self::$draft_teams_table . " ORDER BY RAND()" );
@@ -153,23 +154,23 @@ class DraftAPI {
 		$i = 1;
 		$teams = array();
 		for ( $i = 0; $i < count( $team_keys ); $i++ ) {
-			if ( $team_keys[$i] == 'mike' ) {
-				$teams[] = new DVDB_Team( $team_keys[$i], $i + 1 );
+			if ( $team_keys[ $i ] == 'ryan' ) {
+				$teams[] = new ESPN_Team( $team_keys[ $i ], $i + 1 );
 			} else {
-				$teams[] = new Team( $team_keys[$i], $i + 1 );
+				$teams[] = new DVDB_Team( $team_keys[ $i ], $i + 1 );
 			};
 		}
 
 		wp_cache_set( 'draft_teams', $teams );
 
 		for ( $i = 0; $i < count( $teams ); $i++ ) {
-			$wpdb->insert( self::$draft_order_table, array( 'draft_id' => $draft_id, 'draft_order' => $i, 'team_key' => $teams[$i]->team_key ) );
+			$wpdb->insert( self::$draft_order_table, array( 'draft_id' => $draft_id, 'draft_order' => $i, 'team_key' => $teams[ $i ]->team_key ) );
 
-			$teams[$i]->strategize_draft();
+			$teams[ $i ]->strategize_draft();
 
-			$keepers = $teams[$i]->get_keepers();
+			$keepers = $teams[ $i ]->get_keepers();
 			foreach ( $keepers as $keeper ) {
-				self::draft_player( $keeper['player_id'], $keeper['pick_num'], $teams[$i]->team_key );
+				self::draft_player( $keeper[ 'player_id' ], $keeper[ 'pick_num' ], $teams[ $i ]->team_key );
 			}
 		}
 
@@ -182,10 +183,14 @@ class DraftAPI {
 		}
 	}
 
+	public static function get_num_teams() {
+		return count( self::get_draft_teams() );
+	}
+
 	public static function get_pick_number() {
 		global $wpdb;
 		$pick_number = wp_cache_get( 'pick_number' );
-		if ( !$pick_number ) {
+		if ( ! $pick_number ) {
 			$draft_id = self::get_draft_id();
 			//pick num is based off of first pick, so check that pick 1 exists;
 			if ( 1 == $wpdb->get_var( $wpdb->prepare( "SELECT MIN(pick_num) from " . self::$draft_picks_table . " WHERE draft_id = %d", $draft_id ) ) ) {
@@ -197,7 +202,7 @@ class DraftAPI {
 					"ORDER BY P1.pick_num LIMIT 1", $draft_id, $draft_id );
 				$pick_number = $wpdb->get_var( $query );
 			}
-			if ( !$pick_number ) {
+			if ( ! $pick_number ) {
 				$pick_number = 1;
 			}
 			wp_cache_set( 'pick_number', $pick_number );
@@ -209,9 +214,9 @@ class DraftAPI {
 		global $wpdb;
 
 		$draft_id = wp_cache_get( 'draft_id' );
-		if ( !$draft_id ) {
+		if ( ! $draft_id ) {
 			$draft_id = $wpdb->get_var( "SELECT draft_id from " . self::$draft_table . " WHERE draft_status = 'open'" );
-			if ( !$draft_id ) {
+			if ( ! $draft_id ) {
 				$draft_id = self::start_new_draft();
 			}
 			wp_cache_set( 'draft_id', $draft_id );
@@ -224,7 +229,7 @@ class DraftAPI {
 
 		$args = wp_parse_args( $args, array(
 			'limit' => 500
-			) );
+		) );
 
 		$select = "SELECT P.*, DP.team_key ";
 		$from = "FROM " . self::$players_table . " P ";
@@ -232,13 +237,13 @@ class DraftAPI {
 
 		$order = array();
 
-		if ( !empty( $args['ranker_key'] ) ) {
-			$join .= $wpdb->prepare( " JOIN " . self::$player_rankings_table . " R ON R.player_id = P.player_id AND R.ranker_key = %s ", $args['ranker_key'] );
+		if ( ! empty( $args[ 'ranker_key' ] ) ) {
+			$join .= $wpdb->prepare( " JOIN " . self::$player_rankings_table . " R ON R.player_id = P.player_id AND R.ranker_key = %s ", $args[ 'ranker_key' ] );
 			$order[] = "R.player_order ASC";
 		}
 
-		if ( !empty( $args['meta_key'] ) ) {
-			$join .= $wpdb->prepare( " JOIN " . self::$player_meta_table . " M ON M.player_id = P.player_id AND M.meta_key = %s ", $args['meta_key'] );
+		if ( ! empty( $args[ 'meta_key' ] ) ) {
+			$join .= $wpdb->prepare( " JOIN " . self::$player_meta_table . " M ON M.player_id = P.player_id AND M.meta_key = %s ", $args[ 'meta_key' ] );
 			$order[] = "CAST(M.value as UNSIGNED) ASC";
 		}
 
@@ -247,12 +252,12 @@ class DraftAPI {
 		} else {
 			$orderby = '';
 		}
-		$limit = "LIMIT " . intval( $args['limit'] );
+		$limit = "LIMIT " . intval( $args[ 'limit' ] );
 
 		$sql = "$select $from $join $orderby $limit";
 
 		$players = $wpdb->get_results( $sql );
-		if ( !count( $players ) ) {
+		if ( ! count( $players ) ) {
 			var_dump( $sql );
 		}
 		return $players;
@@ -261,10 +266,10 @@ class DraftAPI {
 	public static function get_draft_picks() {
 		global $wpdb;
 		$picks = wp_cache_get( 'ff_draft_picks' );
-		if ( !$picks ) {
+		if ( ! $picks ) {
 			$picks = $wpdb->get_results( $wpdb->prepare( "SELECT * from " . self::$draft_picks_table . " where draft_id = %d", self::get_draft_id() ) );
 			wp_cache_set( 'ff_draft_picks', $picks );
-			
+
 		}
 		return $picks;
 	}
@@ -279,7 +284,10 @@ class DraftAPI {
 		if ( empty( $teams ) ) {
 			$sql = $wpdb->prepare( "SELECT team_key, draft_order FROM " . self::$draft_order_table . " WHERE draft_id = %d ORDER BY draft_order ASC", self::get_draft_id() );
 			$teams = $wpdb->get_results( $sql );
-			$teams = array_map( function($team) {
+			$teams = array_map( function( $team ) {
+				if ( $team->team_key == 'ryan' ) {
+					return new ESPN_Team( $team->team_key, $team->draft_order );
+				}
 				return new DVDB_Team( $team->team_key, $team->draft_order );
 			}, $teams );
 			wp_cache_set( 'draft_teams', $teams );
@@ -295,24 +303,23 @@ class DraftAPI {
 
 		while ( count( $picks ) < 60 ) {
 			$round = ceil( $pick_num / $num_teams );
-			$team_offset = ($round % 2) ? (($pick_num - 1) % $num_teams) : (($num_teams - ($pick_num % $num_teams)) % $num_teams);
-			$keepers = $teams[$team_offset]->get_keepers();
-			$has_keeper = false;
-			foreach ( $keepers as $keeper ) {
-				if ( $keeper['round'] == $round ) {
-					$has_keeper = true;
-					break;
-				}
-			}
-			if ( !$has_keeper ) {
-				$picks[] = array( 'team' => $teams[$team_offset]->team_key, 'pick' => $pick_num );
-			}
+			$team_offset = ( $round % 2 ) ? ( ( $pick_num - 1 ) % $num_teams ) : ( ( $num_teams - ( $pick_num % $num_teams ) ) % $num_teams );
+			$picks[ $pick_num ] = array( 'team' => $teams[ $team_offset ]->team_key, 'pick' => $pick_num );
 			$pick_num++;
+		}
+
+		foreach ( $teams as $team ) {
+			$team_picks = wp_list_pluck( $team->get_drafted_players(), 'pick_num' );
+			if ( ! count( $team_picks ) ) {
+				continue;
+			}
+			$_team_picks = array_flip( $team_picks );
+			$picks = array_diff_key( $picks, $_team_picks );
 		}
 
 		$html = '<ol>';
 		foreach ( $picks as $pick ) {
-			$html .= '<li class="' . $pick['team'] . '">' . $pick['pick'] . ') ' . $pick['team'] . '</li>';
+			$html .= '<li class="' . $pick[ 'team' ] . '">' . $pick[ 'pick' ] . ') ' . $pick[ 'team' ] . '</li>';
 		}
 		$html .= '</ol>';
 		return $html;
@@ -330,26 +337,26 @@ class DraftAPI {
 
 		$round = ceil( $pick_num / $num_teams );
 
-		$team_offset = ($round % 2) ? (($pick_num - 1) % $num_teams) : (($num_teams - ($pick_num % $num_teams)) % $num_teams);
+		$team_offset = ( $round % 2 ) ? ( ( $pick_num - 1 ) % $num_teams ) : ( ( $num_teams - ( $pick_num % $num_teams ) ) % $num_teams );
 
-		return $teams[$team_offset];
+		return $teams[ $team_offset ];
 	}
 
 	public static function draft_player( $player_id, $pick_num = null, $team_key = null ) {
 		global $wpdb;
 
-		if ( !$pick_num ) {
+		if ( ! $pick_num ) {
 			$pick_num = self::get_pick_number();
 		}
 
-		if ( !$team_key ) {
+		if ( ! $team_key ) {
 			$team_key = self::get_active_draft_team()->team_key;
 		}
 		$success = ( bool ) $wpdb->insert( self::$draft_picks_table, array( 'team_key' => $team_key, 'player_id' => $player_id, 'draft_id' => self::get_draft_id(), 'pick_num' => $pick_num ) );
 
 		wp_cache_delete( 'pick_number' );
 		wp_cache_delete( "{$team_key}_drafted_players" );
-		wp_cache_delete('ff_draft_picks');
+		wp_cache_delete( 'ff_draft_picks' );
 		return $success;
 	}
 
@@ -367,9 +374,9 @@ class DraftAPI {
 		$current_order = $wpdb->get_results( "SELECT player_id, player_order FROM {$wpdb->prefix}player_rankings WHERE ranker_key = 'mike' ORDER BY player_order ASC LIMIT $limit", OBJECT_K );
 
 		for ( $i = 0; $i < count( $new_order ); $i++ ) {
-			$player_id = substr( $new_order[$i], 7 );
+			$player_id = substr( $new_order[ $i ], 7 );
 			$new_position = $i + 1;
-			if ( $new_position != $current_order[$player_id]->player_order ) {
+			if ( $new_position != $current_order[ $player_id ]->player_order ) {
 				$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}player_rankings SET player_order = %d WHERE player_id = %d AND ranker_key = 'mike'", $new_position, $player_id ) );
 			}
 		}

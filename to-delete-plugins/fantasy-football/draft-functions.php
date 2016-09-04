@@ -6,7 +6,7 @@ class DraftAPI {
 	const DB_VER = '0.5';
 
 	public static $draft_table;
-	public static $draft_teams_table;
+	public static $dradft_teams_table;
 	public static $draft_order_table;
 	public static $draft_picks_table;
 	public static $players_table;
@@ -30,16 +30,16 @@ class DraftAPI {
 
 		$current_db_version = get_option( 'ff_db_version', '0.0' );
 		if ( self::DB_VER > $current_db_version ) {
-			require_once(ABSPATH . '/wp-admin/includes/upgrade.php');
+			require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
 
 			$charset_collate = '';
 
-			if ( !empty( $wpdb->charset ) )
+			if ( ! empty( $wpdb->charset ) )
 				$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
-			if ( !empty( $wpdb->collate ) )
+			if ( ! empty( $wpdb->collate ) )
 				$charset_collate .= " COLLATE $wpdb->collate";
 
-			$queries = array( );
+			$queries = array();
 
 			//draft table
 			//
@@ -112,22 +112,22 @@ class DraftAPI {
 
 	public static function get_positions() {
 		return array(
-			'QB' => array( 'QB' ),
-			'RB1' => array( 'RB' ),
-			'RB2' => array( 'RB' ),
-			'WR1' => array( 'WR' ),
-			'WR2' => array( 'WR' ),
-			'TE' => array( 'TE' ),
+			'QB'    => array( 'QB' ),
+			'RB1'   => array( 'RB' ),
+			'RB2'   => array( 'RB' ),
+			'WR1'   => array( 'WR' ),
+			'WR2'   => array( 'WR' ),
+			'TE'    => array( 'TE' ),
 			'RB/WR' => array( 'RB', 'WR', 'TE' ),
-			'DST' => array( 'DST' ),
-			'K' => array( 'K' ),
-			'BE1' => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
-			'BE2' => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
-			'BE3' => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
-			'BE4' => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
-			'BE5' => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
-			'BE6' => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
-			'BE7' => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
+			'DST'   => array( 'DST' ),
+			'K'     => array( 'K' ),
+			'BE1'   => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
+			'BE2'   => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
+			'BE3'   => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
+			'BE4'   => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
+			'BE5'   => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
+			'BE6'   => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
+			'BE7'   => array( 'QB', 'RB', 'WR', 'TE', 'K', 'DST' ),
 		);
 	}
 
@@ -154,25 +154,25 @@ class DraftAPI {
 			'seth'
 		);
 		$i = 1;
-		$teams = array( );
+		$teams = array();
 		for ( $i = 0; $i < count( $team_keys ); $i++ ) {
-			if ( $team_keys[$i] == 'mike' || true ) {
-				$teams[] = new DVDB_Team( $team_keys[$i], $i + 1 );
+			if ( $team_keys[ $i ] == 'mike' || true ) {
+				$teams[] = new DVDB_Team( $team_keys[ $i ], $i + 1 );
 			} else {
-				$teams[] = new FF_Team( $team_keys[$i], $i + 1 );
+				$teams[] = new FF_Team( $team_keys[ $i ], $i + 1 );
 			};
 		}
 
 		wp_cache_set( 'draft_teams', $teams );
 
 		for ( $i = 0; $i < count( $teams ); $i++ ) {
-			$wpdb->insert( self::$draft_order_table, array( 'draft_id' => $draft_id, 'draft_order' => $i, 'team_key' => $teams[$i]->team_key ) );
+			$wpdb->insert( self::$draft_order_table, array( 'draft_id' => $draft_id, 'draft_order' => $i, 'team_key' => $teams[ $i ]->team_key ) );
 
-			$teams[$i]->strategize_draft();
+			$teams[ $i ]->strategize_draft();
 
-			$keepers = $teams[$i]->get_keepers();
+			$keepers = $teams[ $i ]->get_keepers();
 			foreach ( $keepers as $keeper ) {
-				self::draft_player( $keeper['player_id'], $keeper['pick_num'], $teams[$i]->team_key );
+				self::draft_player( $keeper[ 'player_id' ], $keeper[ 'pick_num' ], $teams[ $i ]->team_key );
 			}
 		}
 
@@ -188,7 +188,7 @@ class DraftAPI {
 	public static function get_pick_number() {
 		global $wpdb;
 		$pick_number = wp_cache_get( 'pick_number' );
-		if ( !$pick_number ) {
+		if ( ! $pick_number ) {
 			$draft_id = self::get_draft_id();
 			//pick num is based off of first pick, so check that pick 1 exists;
 			if ( 1 == $wpdb->get_var( $wpdb->prepare( "SELECT MIN(pick_num) from " . self::$draft_picks_table . " WHERE draft_id = %d", $draft_id ) ) ) {
@@ -200,7 +200,7 @@ class DraftAPI {
 					"ORDER BY P1.pick_num LIMIT 1", $draft_id, $draft_id );
 				$pick_number = $wpdb->get_var( $query );
 			}
-			if ( !$pick_number ) {
+			if ( ! $pick_number ) {
 				$pick_number = 1;
 			}
 			wp_cache_set( 'pick_number', $pick_number );
@@ -212,9 +212,9 @@ class DraftAPI {
 		global $wpdb;
 
 		$draft_id = wp_cache_get( 'draft_id' );
-		if ( !$draft_id ) {
+		if ( ! $draft_id ) {
 			$draft_id = $wpdb->get_var( "SELECT draft_id from " . self::$draft_table . " WHERE draft_status = 'open'" );
-			if ( !$draft_id ) {
+			if ( ! $draft_id ) {
 				$draft_id = self::start_new_draft();
 			}
 			wp_cache_set( 'draft_id', $draft_id );
@@ -222,26 +222,26 @@ class DraftAPI {
 		return $draft_id;
 	}
 
-	public static function get_players( $args = array( ) ) {
+	public static function get_players( $args = array() ) {
 		global $wpdb;
 
 		$args = wp_parse_args( $args, array(
 			'limit' => 300
-			) );
+		) );
 
 		$select = "SELECT P.*, DP.team_key ";
 		$from = "FROM " . self::$players_table . " P ";
 		$join = " LEFT JOIN " . self::$draft_picks_table . " DP ON DP.player_id = P.player_id AND DP.draft_id = " . self::get_draft_id() . " ";
 
-		$order = array( );
+		$order = array();
 
-		if ( !empty( $args['ranker_key'] ) ) {
-			$join .= $wpdb->prepare( " JOIN " . self::$player_rankings_table . " R ON R.player_id = P.player_id AND R.ranker_key = %s ", $args['ranker_key'] );
+		if ( ! empty( $args[ 'ranker_key' ] ) ) {
+			$join .= $wpdb->prepare( " JOIN " . self::$player_rankings_table . " R ON R.player_id = P.player_id AND R.ranker_key = %s ", $args[ 'ranker_key' ] );
 			$order[] = "R.player_order ASC";
 		}
 
-		if ( !empty( $args['meta_key'] ) ) {
-			$join .= $wpdb->prepare( " JOIN " . self::$player_meta_table . " M ON M.player_id = P.player_id AND M.meta_key = %s ", $args['meta_key'] );
+		if ( ! empty( $args[ 'meta_key' ] ) ) {
+			$join .= $wpdb->prepare( " JOIN " . self::$player_meta_table . " M ON M.player_id = P.player_id AND M.meta_key = %s ", $args[ 'meta_key' ] );
 			$order[] = "CAST(M.value as UNSIGNED) ASC";
 		}
 
@@ -250,12 +250,12 @@ class DraftAPI {
 		} else {
 			$orderby = '';
 		}
-		$limit = "LIMIT " . intval( $args['limit'] );
+		$limit = "LIMIT " . intval( $args[ 'limit' ] );
 
 		$sql = "$select $from $join $orderby $limit";
 
 		$players = $wpdb->get_results( $sql );
-		if ( !count( $players ) ) {
+		if ( ! count( $players ) ) {
 			var_dump( $sql );
 		}
 		return $players;
@@ -271,40 +271,37 @@ class DraftAPI {
 		if ( empty( $teams ) ) {
 			$sql = $wpdb->prepare( "SELECT team_key, draft_order FROM " . self::$draft_order_table . " WHERE draft_id = %d ORDER BY draft_order ASC", self::get_draft_id() );
 			$teams = $wpdb->get_results( $sql );
-			$teams = array_map( function($team) {
-					return new DVDB_Team( $team->team_key, $team->draft_order );
-				}, $teams );
+			$teams = array_map( function( $team ) {
+				return new DVDB_Team( $team->team_key, $team->draft_order );
+			}, $teams );
 			wp_cache_set( 'draft_teams', $teams );
 		}
 		return $teams;
 	}
 
 	public static function get_upcoming_picks_html() {
-		$picks = array( );
+		$picks = array();
 		$pick_num = self::get_pick_number();
 		$teams = self::get_draft_teams();
 		$num_teams = count( $teams );
 
 		while ( count( $picks ) < 60 ) {
 			$round = ceil( $pick_num / $num_teams );
-			$team_offset = ($round % 2) ? (($pick_num - 1) % $num_teams) : (($num_teams - ($pick_num % $num_teams)) % $num_teams);
-			$keepers = $teams[$team_offset]->get_keepers();
-			$has_keeper = false;
-			foreach ( $keepers as $keeper ) {
-				if ( $keeper['round'] == $round ) {
-					$has_keeper = true;
-					break;
-				}
-			}
-			if ( !$has_keeper ) {
-				$picks[] = array( 'team' => $teams[$team_offset]->team_key, 'pick' => $pick_num );
-			}
+			$team_offset = ( $round % 2 ) ? ( ( $pick_num - 1 ) % $num_teams ) : ( ( $num_teams - ( $pick_num % $num_teams ) ) % $num_teams );
+			$picks[ $pick_num ] = array( 'team' => $teams[ $team_offset ]->team_key, 'pick' => $pick_num );
 			$pick_num++;
 		}
 
+		foreach($teams as $team) {
+			$team_picks = wp_list_pluck($team->get_drafted_players(), 'pick_num');
+			$_team_picks = array_flip($team_picks);
+			$picks = array_diff_key($picks, $_team_picks);
+		}
+		die(var_dump($picks));
+
 		$html = '<ol>';
 		foreach ( $picks as $pick ) {
-			$html .= '<li class="' . $pick['team'] . '">' . $pick['pick'] . ') ' . $pick['team'] . '</li>';
+			$html .= '<li class="' . $pick[ 'team' ] . '">' . $pick[ 'pick' ] . ') ' . $pick[ 'team' ] . '</li>';
 		}
 		$html .= '</ol>';
 		return $html;
@@ -322,19 +319,19 @@ class DraftAPI {
 
 		$round = ceil( $pick_num / $num_teams );
 
-		$team_offset = ($round % 2) ? (($pick_num - 1) % $num_teams) : (($num_teams - ($pick_num % $num_teams)) % $num_teams);
+		$team_offset = ( $round % 2 ) ? ( ( $pick_num - 1 ) % $num_teams ) : ( ( $num_teams - ( $pick_num % $num_teams ) ) % $num_teams );
 
-		return $teams[$team_offset];
+		return $teams[ $team_offset ];
 	}
 
 	public static function draft_player( $player_id, $pick_num = null, $team_key = null ) {
 		global $wpdb;
 
-		if ( !$pick_num ) {
+		if ( ! $pick_num ) {
 			$pick_num = self::get_pick_number();
 		}
 
-		if ( !$team_key ) {
+		if ( ! $team_key ) {
 			$team_key = self::get_active_draft_team()->team_key;
 		}
 		$success = ( bool ) $wpdb->insert( self::$draft_picks_table, array( 'team_key' => $team_key, 'player_id' => $player_id, 'draft_id' => self::get_draft_id(), 'pick_num' => $pick_num ) );
@@ -358,9 +355,9 @@ class DraftAPI {
 		$current_order = $wpdb->get_results( "SELECT player_id, player_order FROM {$wpdb->prefix}player_rankings WHERE ranker_key = 'mike' ORDER BY player_order ASC LIMIT $limit", OBJECT_K );
 
 		for ( $i = 0; $i < count( $new_order ); $i++ ) {
-			$player_id = substr( $new_order[$i], 7 );
+			$player_id = substr( $new_order[ $i ], 7 );
 			$new_position = $i + 1;
-			if ( $new_position != $current_order[$player_id]->player_order ) {
+			if ( $new_position != $current_order[ $player_id ]->player_order ) {
 				$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}player_rankings SET player_order = %d WHERE player_id = %d AND ranker_key = 'mike'", $new_position, $player_id ) );
 			}
 		}
@@ -409,109 +406,109 @@ class FF_Team {
 
 	public static function get_position_draft_by() {
 		return array(
-			'QB' => 8,
-			'RB1' => 5,
-			'RB2' => 11,
-			'WR1' => 5,
-			'WR2' => 11,
-			'TE' => 12,
+			'QB'    => 8,
+			'RB1'   => 5,
+			'RB2'   => 11,
+			'WR1'   => 5,
+			'WR2'   => 11,
+			'TE'    => 12,
 			'RB/WR' => 11,
-			'DST' => 15,
-			'K' => 16
+			'DST'   => 15,
+			'K'     => 16
 		);
 	}
 
 	/**
 	 * Maps each position to the earliest round it can be selected.  This helps limit
 	 * teams from picking the same position over and over again
-	 * 
+	 *
 	 * @todo store randomized limits wit teams so all teams don't grab second QB's right away
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function get_positions_limits() {
 		$limits = array(
 			'seth' => array(
 				array( //2012
-					'QB' => array( 0, 7 ),
-					'RB' => array( 0, 0, 5, 5, 8, 8, 8 ),
-					'WR' => array( 0, 0, 6, 9, 11, 12 ),
-					'TE' => array( 0, 5 ),
+					'QB'  => array( 0, 7 ),
+					'RB'  => array( 0, 0, 5, 5, 8, 8, 8 ),
+					'WR'  => array( 0, 0, 6, 9, 11, 12 ),
+					'TE'  => array( 0, 5 ),
 					'DST' => array( 10 ),
-					'K' => array( 15 ),
+					'K'   => array( 15 ),
 				),
 				array(
-					'QB' => array( 0, 8 ),
-					'RB' => array( 0, 0, 5, 5, 8, 8, 8 ),
-					'WR' => array( 0, 0, 7, 10, 11, 12 ),
-					'TE' => array( 0, 2, 11 ),
+					'QB'  => array( 0, 8 ),
+					'RB'  => array( 0, 0, 5, 5, 8, 8, 8 ),
+					'WR'  => array( 0, 0, 7, 10, 11, 12 ),
+					'TE'  => array( 0, 2, 11 ),
 					'DST' => array( 10 ),
-					'K' => array( 14 ),
+					'K'   => array( 14 ),
 				)
 			),
 			'seth' => array(
 				array(
-					'QB' => array( 0, 8 ),
-					'RB' => array( 0, 0, 5, 5, 8, 8, 8 ),
-					'WR' => array( 0, 0, 7, 10, 11, 12 ),
-					'TE' => array( 0, 2, 11 ),
+					'QB'  => array( 0, 8 ),
+					'RB'  => array( 0, 0, 5, 5, 8, 8, 8 ),
+					'WR'  => array( 0, 0, 7, 10, 11, 12 ),
+					'TE'  => array( 0, 2, 11 ),
 					'DST' => array( 10 ),
-					'K' => array( 14 ),
+					'K'   => array( 14 ),
 				),
 				array(
-					'QB' => array( 0, 8 ),
-					'RB' => array( 0, 0, 5, 5, 8, 8, 8 ),
-					'WR' => array( 0, 0, 7, 10, 11, 12 ),
-					'TE' => array( 0, 2, 11 ),
+					'QB'  => array( 0, 8 ),
+					'RB'  => array( 0, 0, 5, 5, 8, 8, 8 ),
+					'WR'  => array( 0, 0, 7, 10, 11, 12 ),
+					'TE'  => array( 0, 2, 11 ),
 					'DST' => array( 10 ),
-					'K' => array( 14 ),
+					'K'   => array( 14 ),
 				)
 			),
 			'seth' => array(
 				array(
-					'QB' => array( 0, 8 ),
-					'RB' => array( 0, 0, 5, 5, 8, 8, 8 ),
-					'WR' => array( 0, 0, 7, 10, 11, 12 ),
-					'TE' => array( 0, 2, 11 ),
+					'QB'  => array( 0, 8 ),
+					'RB'  => array( 0, 0, 5, 5, 8, 8, 8 ),
+					'WR'  => array( 0, 0, 7, 10, 11, 12 ),
+					'TE'  => array( 0, 2, 11 ),
 					'DST' => array( 10 ),
-					'K' => array( 14 ),
+					'K'   => array( 14 ),
 				),
 				array(
-					'QB' => array( 0, 8 ),
-					'RB' => array( 0, 0, 5, 5, 8, 8, 8 ),
-					'WR' => array( 0, 0, 7, 10, 11, 12 ),
-					'TE' => array( 0, 2, 11 ),
+					'QB'  => array( 0, 8 ),
+					'RB'  => array( 0, 0, 5, 5, 8, 8, 8 ),
+					'WR'  => array( 0, 0, 7, 10, 11, 12 ),
+					'TE'  => array( 0, 2, 11 ),
 					'DST' => array( 10 ),
-					'K' => array( 14 ),
+					'K'   => array( 14 ),
 				)
 			),
 			'seth' => array(
 				array(
-					'QB' => array( 0, 8 ),
-					'RB' => array( 0, 0, 5, 5, 8, 8, 8 ),
-					'WR' => array( 0, 0, 7, 10, 11, 12 ),
-					'TE' => array( 0, 2, 11 ),
+					'QB'  => array( 0, 8 ),
+					'RB'  => array( 0, 0, 5, 5, 8, 8, 8 ),
+					'WR'  => array( 0, 0, 7, 10, 11, 12 ),
+					'TE'  => array( 0, 2, 11 ),
 					'DST' => array( 10 ),
-					'K' => array( 14 ),
+					'K'   => array( 14 ),
 				),
 				array(
-					'QB' => array( 0, 8 ),
-					'RB' => array( 0, 0, 5, 5, 8, 8, 8 ),
-					'WR' => array( 0, 0, 7, 10, 11, 12 ),
-					'TE' => array( 0, 2, 11 ),
+					'QB'  => array( 0, 8 ),
+					'RB'  => array( 0, 0, 5, 5, 8, 8, 8 ),
+					'WR'  => array( 0, 0, 7, 10, 11, 12 ),
+					'TE'  => array( 0, 2, 11 ),
 					'DST' => array( 10 ),
-					'K' => array( 14 ),
+					'K'   => array( 14 ),
 				)
 			)
 		);
 
 		return array(
-			'QB' => array( 0, 8 ),
-			'RB' => array( 0, 0, 5, 5, 8, 8, 8 ),
-			'WR' => array( 0, 0, 7, 10, 11, 12 ),
-			'TE' => array( 0, 2, 11 ),
+			'QB'  => array( 0, 8 ),
+			'RB'  => array( 0, 0, 5, 5, 8, 8, 8 ),
+			'WR'  => array( 0, 0, 7, 10, 11, 12 ),
+			'TE'  => array( 0, 2, 11 ),
 			'DST' => array( 10 ),
-			'K' => array( 14 ),
+			'K'   => array( 14 ),
 		);
 	}
 
@@ -522,38 +519,37 @@ class FF_Team {
 
 	public function get_keepers() {
 		$all_keepers = array(
-			'mike' => array(
+			'mike'   => array(
 				array( 'player_id' => 14885, 'round' => 5 ), //Doug Martin
 				array( 'player_id' => 11307, 'round' => 2 ), //Jamaal Charles
 			),
-			'seth' => array(
+			'seth'   => array(
 				array( 'player_id' => 15009, 'round' => 15 ), //Alfred Morris
 				//array( 'player_id' => 13983, 'round' => 2 ), //AJ Green
 				//array( 'player_id' => 9588, 'round' => 4 ), //Reggie Bush
-			//array( 'player_id' => 12483, 'round' => 1 ), //Matt Stafford
+				//array( 'player_id' => 12483, 'round' => 1 ), //Matt Stafford
 			),
-			'emily' => array(
+			'emily'  => array(
 				//array( 'player_id' => 2330, 'round' => 1 ), //Tom Brady
 				array( 'player_id' => 11252, 'round' => 8 ), //Joe Flacco
 				//array( 'player_id' => 11283, 'round' => 2 ), //1 -- Steven Jackson
 			),
-			'weston' => array(
-			),
-			'james' => array(
+			'weston' => array(),
+			'james'  => array(
 				//array( 'player_id' => 12514, 'round' => 1 ), //LeSean McCoy
 				//array( 'player_id' => 11278, 'round' => 2 ), //Matt Forte
 				array( 'player_id' => 14053, 'round' => 15 ), //Randall Cobb
-			//array( 'player_id' => 9705, 'round' => 3 ), //Brandon Marshall
+				//array( 'player_id' => 9705, 'round' => 3 ), //Brandon Marshall
 			),
-			'tyler' => array(
+			'tyler'  => array(
 				array( 'player_id' => 13203, 'round' => 12 ), //CJ Spiller
 				array( 'player_id' => 14028, 'round' => 9 ), //Stevan Ridley
 			),
-			'beau' => array(
+			'beau'   => array(
 				array( 'player_id' => 10452, 'round' => 1 ), //Adrian Peterson
 				array( 'player_id' => 10447, 'round' => 2 ), //1 Calvin Johnson
 			),
-			'ryan' => array(
+			'ryan'   => array(
 				array( 'player_id' => 11289, 'round' => 1 ), //Ray Rice
 				//array( 'player_id' => 13271, 'round' => 8 ), //Eric Decker
 				//array('player_id' => 13489, 'round' => 15), //Mike WIlliams
@@ -561,12 +557,12 @@ class FF_Team {
 			),
 		);
 
-		$keepers = ( array ) $all_keepers[$this->team_key];
+		$keepers = ( array ) $all_keepers[ $this->team_key ];
 		for ( $i = 0; $i < count( $keepers ); $i++ ) {
-			if ( $keepers[$i]['round'] % 2 ) {
-				$keepers[$i]['pick_num'] = (($keepers[$i]['round'] - 1) * 8) + $this->pick;
+			if ( $keepers[ $i ][ 'round' ] % 2 ) {
+				$keepers[ $i ][ 'pick_num' ] = ( ( $keepers[ $i ][ 'round' ] - 1 ) * 8 ) + $this->pick;
 			} else {
-				$keepers[$i]['pick_num'] = (($keepers[$i]['round'] - 1) * 8) + (8 + 1 - $this->pick);
+				$keepers[ $i ][ 'pick_num' ] = ( ( $keepers[ $i ][ 'round' ] - 1 ) * 8 ) + ( 8 + 1 - $this->pick );
 			}
 		}
 		return $keepers;
@@ -574,6 +570,8 @@ class FF_Team {
 
 	public function strategize_draft() {
 		global $wpdb;
+
+		$num_teams = DraftAPI::get_num_teams();
 
 		if ( $this->team_key == 'mike' ) {
 			//don't erase my rankings
@@ -586,10 +584,10 @@ class FF_Team {
 		//get players and adp
 		$players = DraftAPI::get_players( array( 'meta_key' => 'adp_' . date( 'Y' ) . '_espn' ) );
 
-		$player_ranks = array( );
+		$player_ranks = array();
 		//calculate order based on distribution
 		foreach ( $players as $player ) {
-			if ( !is_a( $player, 'FF_Player' ) ) {
+			if ( ! is_a( $player, 'FF_Player' ) ) {
 				$player = new FF_Player( $player->player_id );
 			}
 			$adp = $player->getMeta( 'adp_' . date( 'Y' ) . '_ffcalculator' );
@@ -598,32 +596,32 @@ class FF_Team {
 				$adp = 300;
 			}
 			$s = floatval( $player->getMeta( 'stddev_2013_ffcalculator' ) / 10 );
-			if ( !$s ) {
-				$s = $adp / (2 * sqrt( $adp ) );
+			if ( ! $s ) {
+				$s = $adp / ( 2 * sqrt( $adp ) );
 			}
 			if ( $player->player_position == 'QB' ) {
 				//QB's in our league tend to go much earlier than adp, so have them get drafted a bit earlier
-				$adp = ((8 * $adp) / 9) - 12;
+				$adp = ( ( 8 * $adp ) / 9 ) - 12;
 			}
 			$player_ranks[] = array(
 				'player_id' => $player->player_id,
-				'ranking' => gauss_ms( $adp, $s )
+				'ranking'   => gauss_ms( $adp, $s )
 			);
 		}
 
 		//reorder by new order
-		usort( $player_ranks, function($rank_a, $rank_b) {
-				if ( $rank_a['ranking'] == $rank_b['ranking'] ) {
-					return 0;
-				}
-				return ($rank_a['ranking'] < $rank_b['ranking'] ) ? -1 : 1;
-			} );
+		usort( $player_ranks, function( $rank_a, $rank_b ) {
+			if ( $rank_a[ 'ranking' ] == $rank_b[ 'ranking' ] ) {
+				return 0;
+			}
+			return ( $rank_a[ 'ranking' ] < $rank_b[ 'ranking' ] ) ? -1 : 1;
+		} );
 
 
 		//rank players according to adp
 		$i = 1;
 		foreach ( $player_ranks as $player_rank ) {
-			$wpdb->insert( DraftAPI::$player_rankings_table, array( 'ranker_key' => $this->team_key, 'player_order' => $i, 'player_id' => $player_rank['player_id'] ) );
+			$wpdb->insert( DraftAPI::$player_rankings_table, array( 'ranker_key' => $this->team_key, 'player_order' => $i, 'player_id' => $player_rank[ 'player_id' ] ) );
 			$i++;
 		}
 	}
@@ -638,7 +636,7 @@ class FF_Team {
 		foreach ( $roster as $roster_spot => $player ) {
 			$html .= '<li><em>' . $roster_spot . '</em>';
 			if ( $player ) {
-				if ( !is_a( $player, 'FF_Player' ) ) {
+				if ( ! is_a( $player, 'FF_Player' ) ) {
 					$player = new FF_Player( $player->player_id );
 				}
 
@@ -664,23 +662,23 @@ class FF_Team {
 
 		//remove all used position limits
 		foreach ( $roster as $position => $player ) {
-			if ( !is_null( $player ) ) {
-				array_shift( $position_limits[$player->player_position] );
+			if ( ! is_null( $player ) ) {
+				array_shift( $position_limits[ $player->player_position ] );
 			}
 		}
 
-		$selectable_positions = array( );
+		$selectable_positions = array();
 		foreach ( $position_limits as $position => $limits ) {
-			if ( is_array( $limits ) && count( $limits ) && $limits[0] <= $round ) {
+			if ( is_array( $limits ) && count( $limits ) && $limits[ 0 ] <= $round ) {
 				$selectable_positions[] = $position;
 			}
 		}
 
-		$required_positions = array( );
+		$required_positions = array();
 		$positions = DraftAPI::get_positions();
 		foreach ( self::get_position_draft_by() as $position => $pick_by ) {
-			if ( $pick_by <= $round && is_null( $roster[$position] ) ) {
-				$required_positions = array_merge( $required_positions, $positions[$position] );
+			if ( $pick_by <= $round && is_null( $roster[ $position ] ) ) {
+				$required_positions = array_merge( $required_positions, $positions[ $position ] );
 			}
 		}
 		if ( count( $required_positions ) > 0 ) {
@@ -710,12 +708,12 @@ class FF_Team {
 				"WHERE DP.team_key = %s and DP.draft_id = %d ORDER BY pick_id asc", $this->team_key, DraftAPI::get_draft_id() );
 			$team_players = $wpdb->get_results( $sql );
 			$team_positions = DraftAPI::get_positions();
-			$roster = array( );
+			$roster = array();
 			foreach ( $team_positions as $roster_key => $positions ) {
-				$roster[$roster_key] = null;
+				$roster[ $roster_key ] = null;
 				for ( $i = 0; $i < count( $team_players ); $i++ ) {
-					if ( in_array( $team_players[$i]->player_position, $positions ) ) {
-						$roster[$roster_key] = new FF_Player( array_shift( array_splice( $team_players, $i, 1 ) )->player_id );
+					if ( in_array( $team_players[ $i ]->player_position, $positions ) ) {
+						$roster[ $roster_key ] = new FF_Player( array_shift( array_splice( $team_players, $i, 1 ) )->player_id );
 						//unset($team_players[$i]);
 						break;
 					}
@@ -738,8 +736,8 @@ class DVDB_Team extends FF_Team {
 		$drafted_players = $this->get_drafted_players();
 
 		foreach ( $drafted_players as $player ) {
-			if ( !is_null( $player ) ) {
-				$position_weights[$player->player_position]-= 1;
+			if ( ! is_null( $player ) ) {
+				$position_weights[ $player->player_position ] -= 1;
 			}
 		}
 
@@ -749,15 +747,15 @@ class DVDB_Team extends FF_Team {
 				$continue_vbd = true;
 			}
 		}
-		if ( !$continue_vbd ) {
-			return array( );
+		if ( ! $continue_vbd ) {
+			return array();
 		}
 
 		$num_teams = 8;
 		$pick_num = DraftAPI::get_pick_number();
 		$round = DraftAPI::get_round();
 		$draft_id = DraftAPI::get_draft_id();
-		$pick_options = array( );
+		$pick_options = array();
 		$keepers = $this->get_keepers();
 		$year = date( 'Y' );
 		foreach ( $position_weights as $position => $weight ) {
@@ -765,18 +763,18 @@ class DVDB_Team extends FF_Team {
 			//so we need to expand the coverage
 			$endRound = floor( $weight ) + $round;
 			foreach ( $keepers as $keeper ) {
-				if ( $keeper['round'] > $round && $keeper['round'] <= $endRound ) {
+				if ( $keeper[ 'round' ] > $round && $keeper[ 'round' ] <= $endRound ) {
 					$weight++;
 				}
 			}
 			$round_weight = $weight;
 			$pick_cnt = floor( $weight / 2 ) * 2 * $num_teams;
-			$weight = $weight - (floor( $weight / 2 ) * 2);
+			$weight = $weight - ( floor( $weight / 2 ) * 2 );
 
 			if ( $round % 2 ) {
 				//odd round
 				if ( $weight >= 1 ) {
-					$pick_cnt += (2 * ($num_teams - $this->pick));
+					$pick_cnt += ( 2 * ( $num_teams - $this->pick ) );
 					$weight -= 1;
 				}
 				$pick_cnt += 2 * $this->pick * $weight;
@@ -785,22 +783,22 @@ class DVDB_Team extends FF_Team {
 					$pick_cnt += 2 * $this->pick;
 					$weight -= 1;
 				}
-				$pick_cnt += 2 * ($num_teams - $this->pick) * $weight;
+				$pick_cnt += 2 * ( $num_teams - $this->pick ) * $weight;
 			}
 			$next_base_pick = $pick_cnt + $pick_num;
 			if ( $position == 'QB' ) {
-				$next_base_pick = (($next_base_pick / 8) * 9) + 12;
+				$next_base_pick = ( ( $next_base_pick / 8 ) * 9 ) + 12;
 			}
 
 			$picked_by_next = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) " .
-					"FROM " . DraftAPI::$players_table . " P " .
-					"JOIN " . DraftAPI::$player_rankings_table . " R ON P.player_id = R.player_id and R.ranker_key = %s " .
-					"WHERE R.player_order <= %d AND player_position = %s", $this->team_key, $next_base_pick, $position ) );
+				"FROM " . DraftAPI::$players_table . " P " .
+				"JOIN " . DraftAPI::$player_rankings_table . " R ON P.player_id = R.player_id and R.ranker_key = %s " .
+				"WHERE R.player_order <= %d AND player_position = %s", $this->team_key, $next_base_pick, $position ) );
 
 			$picked_already = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) " .
-					"FROM " . DraftAPI::$draft_picks_table . " DP " .
-					"JOIN " . DraftAPI::$players_table . " P ON DP.player_id = P.player_id " .
-					"WHERE DP.draft_id = %d and P.player_position = %s", $draft_id, $position ) );
+				"FROM " . DraftAPI::$draft_picks_table . " DP " .
+				"JOIN " . DraftAPI::$players_table . " P ON DP.player_id = P.player_id " .
+				"WHERE DP.draft_id = %d and P.player_position = %s", $draft_id, $position ) );
 
 			if ( $picked_by_next - $picked_already > 0 ) {
 				$players = $wpdb->get_results( "SELECT AVG(PM.value) as value, PM.player_id " .
@@ -814,8 +812,8 @@ class DVDB_Team extends FF_Team {
 						"LIMIT %d", $draft_id, $position, $picked_by_next - $picked_already + 1 ) );
 
 				if ( count( $players ) ) {
-					$next_value = $players[0]->value;
-					$base_line_value = ($players[count( $players ) - 1]->value + $players[count( $players ) - 2]->value) / 2;
+					$next_value = $players[ 0 ]->value;
+					$base_line_value = ( $players[ count( $players ) - 1 ]->value + $players[ count( $players ) - 2 ]->value ) / 2;
 					$pick_options[] = array( 'position' => $position, 'players' => $players, 'value' => $next_value - $base_line_value, 'weight' => $round_weight );
 				}
 			}
@@ -828,19 +826,23 @@ class DVDB_Team extends FF_Team {
 		foreach ( $this->get_pick_options() as $position_set ) :
 			?>
 			<?php
-			$baseline = ($position_set['players'][count( $position_set['players'] ) - 1]->value + $position_set['players'][count( $position_set['players'] ) - 2]->value) / 2;
+			$baseline = ( $position_set[ 'players' ][ count( $position_set[ 'players' ] ) - 1 ]->value + $position_set[ 'players' ][ count( $position_set[ 'players' ] ) - 2 ]->value ) / 2;
 			?>
 			<ul>
-				<li>Position: <?php echo $position_set['position'] ?></li>
-				<li>Baseline:  <?php echo round( $baseline, 1 ); ?></li>
-				<li>Beta: <?php echo $position_set['weight'] ?>, Players: <?php echo count( $position_set['players'] ) ?>
+				<li>Position: <?php echo $position_set[ 'position' ] ?></li>
+				<li>Baseline: <?php echo round( $baseline, 1 ); ?></li>
+				<li>Beta: <?php echo $position_set[ 'weight' ] ?>,
+					Players: <?php echo count( $position_set[ 'players' ] ) ?>
 				<li><strong>Next 5 Players by ADP:</strong></li>
-				<?php for ( $i = 0; $i < 5 && $i < count( $position_set['players'] ); $i++ ) : $player = DraftAPI::get_player( $position_set['players'][$i]->player_id ) ?>
-					<li><?php echo $player->player_name ?>, &nbsp; Proj: <?php echo round( $position_set['players'][$i]->value, 1 ) ?>, &nbsp; Value: <?php echo round( $position_set['players'][$i]->value - $baseline, 1 ) ?></li>
+				<?php for ( $i = 0; $i < 5 && $i < count( $position_set[ 'players' ] ); $i++ ) : $player = DraftAPI::get_player( $position_set[ 'players' ][ $i ]->player_id ) ?>
+					<li><?php echo $player->player_name ?>, &nbsp;
+						Proj: <?php echo round( $position_set[ 'players' ][ $i ]->value, 1 ) ?>, &nbsp;
+						Value: <?php echo round( $position_set[ 'players' ][ $i ]->value - $baseline, 1 ) ?></li>
 				<?php endfor; ?>
 				<li><strong>Baseline Players:</strong></li>
-				<?php for ( $i = max( array( count( $position_set['players'] ) - 3, 0 ) ); $i < count( $position_set['players'] ); $i++ ) : $player = DraftAPI::get_player( $position_set['players'][$i]->player_id ) ?>
-					<li><?php echo $player->player_name ?>, &nbsp; Proj: <?php echo round( $position_set['players'][$i]->value, 1 ) ?></li>
+				<?php for ( $i = max( array( count( $position_set[ 'players' ] ) - 3, 0 ) ); $i < count( $position_set[ 'players' ] ); $i++ ) : $player = DraftAPI::get_player( $position_set[ 'players' ][ $i ]->player_id ) ?>
+					<li><?php echo $player->player_name ?>, &nbsp;
+						Proj: <?php echo round( $position_set[ 'players' ][ $i ]->value, 1 ) ?></li>
 				<?php endfor; ?>
 			</ul>
 			<?php
@@ -850,38 +852,38 @@ class DVDB_Team extends FF_Team {
 
 	public function get_position_weights() {
 		return array(
-			'QB' => 1.5,
-			'RB' => 3.75,
-			'WR' => 3.75,
-			'TE' => 1.5,
+			'QB'  => 1.5,
+			'RB'  => 3.75,
+			'WR'  => 3.75,
+			'TE'  => 1.5,
 			'DST' => 1.5,
-			'K' => 0,
+			'K'   => 0,
 		);
 	}
 
 	public function choose_player() {
 
 		$pick_options = $this->get_pick_options();
-		$possible_picks = array( );
+		$possible_picks = array();
 
-		usort( $pick_options, function($option_a, $option_b) {
-				return $option_a['value'] > $option_b['value'] ? -1 : 1;
-			} );
+		usort( $pick_options, function( $option_a, $option_b ) {
+			return $option_a[ 'value' ] > $option_b[ 'value' ] ? -1 : 1;
+		} );
 
 		$value = 0;
 		foreach ( $pick_options as $pick_option ) {
-			if ( $pick_option['value'] >= $value ) {
-				$possible_picks[] = $pick_option['players'][0]->player_id;
-				$value = $pick_option['value'];
+			if ( $pick_option[ 'value' ] >= $value ) {
+				$possible_picks[] = $pick_option[ 'players' ][ 0 ]->player_id;
+				$value = $pick_option[ 'value' ];
 			} else {
 				break;
 			}
 		}
 		$player_id = false;
 		if ( count( $possible_picks ) ) {
-			$player_id = $possible_picks[rand( 0, count( $possible_picks ) - 1 )];
+			$player_id = $possible_picks[ rand( 0, count( $possible_picks ) - 1 ) ];
 		}
-		if ( !$player_id ) {
+		if ( ! $player_id ) {
 			return parent::choose_player();
 		}
 		return $player_id;
@@ -917,9 +919,9 @@ class FF_Player {
 	public function __get( $field ) {
 		global $wpdb;
 		$player_data = wp_cache_get( 'player_data_' . $this->player_id );
-		if ( !is_array( $player_data ) ) {
+		if ( ! is_array( $player_data ) ) {
 			$player_data = $wpdb->get_row( $wpdb->prepare( "SELECT * from " . DraftAPI::$players_table
-					. " WHERE player_id = %d", $this->player_id ) );
+				. " WHERE player_id = %d", $this->player_id ) );
 			wp_cache_set( 'player_data_' . $this->player_id, $player_data );
 		}
 		return isset( $player_data->$field ) ? $player_data->$field : null;
@@ -928,12 +930,12 @@ class FF_Player {
 	public function getMeta( $key ) {
 		global $wpdb;
 		$player_meta = wp_cache_get( 'player_meta_' . $this->player_id );
-		if ( !is_array( $player_meta ) ) {
+		if ( ! is_array( $player_meta ) ) {
 			$player_meta = $wpdb->get_results( $wpdb->prepare( "SELECT meta_key, value from " . DraftAPI::$player_meta_table
-					. " WHERE player_id = %d", $this->player_id ), OBJECT_K );
+				. " WHERE player_id = %d", $this->player_id ), OBJECT_K );
 			wp_cache_set( 'player_meta_' . $this->player_id, $player_meta );
 		}
-		return isset( $player_meta[$key] ) ? $player_meta[$key]->value : null;
+		return isset( $player_meta[ $key ] ) ? $player_meta[ $key ]->value : null;
 	}
 
 	public function getProjection() {

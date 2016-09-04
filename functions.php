@@ -99,7 +99,7 @@ function ajax_get_teams() {
 	$teams = DraftAPI::get_draft_teams();
 	$teams = array_map(function($team){
 		return [
-			'name' => ucfirst($team->team_key),
+			'name' => $team->name,
 			'key' => $team->team_key
 		];
 	}, $teams);
